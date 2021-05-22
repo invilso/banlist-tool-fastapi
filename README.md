@@ -15,8 +15,11 @@ python -venv env
 ```
 Активируем виртуальное окружение:
 ```
-source env/bin/activate - Linux
-souce env/Scripts/activate.bat - Windows
+Linux:
+source env/bin/activate 
+Windows:
+cd env/Scripts
+activate.bat
 ```
 Устанавливаем зависимости:
 ```
