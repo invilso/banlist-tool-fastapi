@@ -1,0 +1,31 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ru" xml:lang="ru">
+    <head>
+        <title>
+            {%if server == 0%}RPG{%elif server == 1%}RP1{%elif server == 2%}RP2{% endif %} || BANLIST || {{count}}
+        </title>
+        <!-- Bootstrap core CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous"> 
+    </head>
+    <body>
+        <div class="container">
+            <!-- Example row of columns -->
+            <div class="row">
+                <div class="col-xs-offset-1 col-sm-offset-1 col-xs-8 col-sm-11 text-justify"> 
+                    <br>
+                    <h2>
+                        {%if server_id == 0%}RPG{%elif server_id == 1%}RP1{%elif server_id == 2%}RP2{% endif %} || BANLIST || Записей: {{count}}
+                    </h2>
+                    <hr>
+                    {%if bans%}
+                        {% for el in bans %}
+                            <p>[{{loop.index0}}]>> {{el}}</p>
+                        {% endfor %}
+                    {% else %}
+                        <p>Заполните данную страницу!!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

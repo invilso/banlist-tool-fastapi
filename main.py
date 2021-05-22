@@ -1,5 +1,14 @@
 from logic import Get
+from fastapi import FastAPI, Request
+from fastapi.staticfiles import StaticFiles 
+from fastapi.templating import Jinja2Templates
+from models import BanlistLongPolling, BanlistGetRaw
+
 logic = Get()
+
+app = FastAPI()
+app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
 
 @app.get("/banlist/web/{server_id}/{count}")
 async def getWeb(request: Request, server_id: int, count: int):
