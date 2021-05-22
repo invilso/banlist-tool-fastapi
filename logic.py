@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 import asyncio
 import json
 
-class Get():
+class Logic():
     async def longPoll(self, server_id, ban):
         s = Serializer()
         respdata = [False]
@@ -22,4 +22,5 @@ class Get():
     
     async def getWeb(self, server, count):
         s = Serializer()
-        return s.get(server, count)
+        r = await s.get(server, count)
+        return r

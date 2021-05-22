@@ -1,10 +1,10 @@
 import requests
 from memory_profiler import memory_usage
 import antiddos 
+import time
 
 class LoginAndGet:
     session = requests.Session()
-    bps = Bypass()
     cookies = {}
     data_for_login = {"login": "", "password": "", "remember_me": 1}
     data_login = {}
@@ -61,7 +61,7 @@ class LoginAndGet:
                         k.write('Clean json')
                     with open("temp_json.html", "wb") as k:
                         for key, chunk in enumerate(r.iter_content(1024)):
-                            if key < 1200:
+                            if key < 1600:
                                 if not chunk:
                                     break
                                 k.write(chunk)

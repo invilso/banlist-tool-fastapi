@@ -1,3 +1,3 @@
 # BanlistTools Fast API
-## Install:
-
+## Python:
+## Lua:
