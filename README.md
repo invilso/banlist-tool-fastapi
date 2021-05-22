@@ -3,14 +3,19 @@
 ### Установка:
 Клонируем репозиторий:
 >git clone https://github.com/invilso/banlist-tool-fastapi.git
+
 Переходим в директорию:
 >cd banlist-tool-fastapi
+
 Создаем виртуальное окружение:
 >python -venv env
+
 Устанавливаем зависимости:
 >pip install -r requirements.txt
+
 Запускаем на localhost и 8000 порте, с поддержкой автоперезагрузки при изменениях:
 >uvicorn main:app --host 127.0.0.1 --port 8000 --reload
+
 ### API:
 #### Получение банлиста:
 >Метод: POST
