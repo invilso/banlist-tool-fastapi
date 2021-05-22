@@ -10,6 +10,10 @@
 Создаем виртуальное окружение:
 >python -venv env
 
+Активируем виртуальное окружение:
+>source env/bin/activate - Linux
+souce env/Scripts/activate.bat - Windows
+
 Устанавливаем зависимости:
 >pip install -r requirements.txt
 
