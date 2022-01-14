@@ -11,7 +11,7 @@ cd banlist-tool-fastapi
 ```
 Создаем виртуальное окружение:
 ```
-python -venv env
+python -m venv env
 ```
 Активируем виртуальное окружение:
 ```
