@@ -4,15 +4,18 @@ import asyncio
 class Serializer():
      
     async def get(self, server:int, coun:int):
-        if server == 0:
-            with open("rpg.json", "r", encoding="utf-8") as f:
-                return json.load(f)[0:coun]
-        elif server == 1:
-            with open("rp.json", "r", encoding="utf-8") as f:
-                return  json.load(f)[0:coun]
-        elif server == 2:
-            with open("rp2.json", "r", encoding="utf-8") as f:
-                return json.load(f)[0:coun]
+        try:
+            if server == 0:
+                with open("rpg.json", "r", encoding="utf-8") as f:
+                    return json.load(f)[0:coun]
+            elif server == 1:
+                with open("rp.json", "r", encoding="utf-8") as f:
+                    return  json.load(f)[0:coun]
+            elif server == 2:
+                with open("rp2.json", "r", encoding="utf-8") as f:
+                    return json.load(f)[0:coun]
+        except:
+            return ['Строки ещё не загрузились']
 
     async def longpollGet(self, server: int, ban: str):
         if server == 0:
@@ -23,11 +26,14 @@ class Serializer():
             return await self.getLongpollLine('rp2.json', ban)
     
     async def getLongpollLine(self, server: str, ban: str):
-        with open(server, "r", encoding="utf-8") as f: 
-            try:  
-                return await self.checkLongPoll(json.load(f)[0], ban)
-            except Exception:
-                return False
+        try:
+            with open(server, "r", encoding="utf-8") as f: 
+                try:  
+                    return await self.checkLongPoll(json.load(f)[0], ban)
+                except Exception:
+                    return False
+        except:
+            return ['Строки ещё не загрузились']
     
     async def checkLongPoll(self, line: str, ban: str):
         if line[1:] != ban:

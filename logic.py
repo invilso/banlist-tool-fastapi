@@ -1,9 +1,25 @@
+import time
 from serializer import Serializer
 from fastapi.responses import JSONResponse
 import asyncio
 import json
+import os
+from parse import Parser
+
+parser = Parser()
 
 class Logic():
+    servers = ['rpg', 'rp', 'rp2']
+
+    async def updateBans(self, server_id):
+        try:
+            _, _, _, _, _, _, _, _, mtime, _ = os.stat(self.servers[server_id]+'.json')
+            if mtime+300 < time.time():
+                parser.parse(server_id)
+            return None
+        except FileNotFoundError:
+            parser.parse(server_id)
+        
     async def longPoll(self, server_id, ban):
         s = Serializer()
         respdata = [False]
