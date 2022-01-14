@@ -12,9 +12,9 @@ class Parser():
     def parse(self, server: str):
         with open(server+'.json', "w+", encoding="utf-8") as f:
             if server == 'rp2':
-                f.write(json.dumps(re.split('<br>', self.forum.getF("http://gta-trinity.ru/"+server+"mon/bans.php", False))[5::], sort_keys=True, indent=4))
+                f.write(json.dumps(re.split('<br>', self.forum.getF("http://gta-trinity.ru/"+server+"mon/bans.php", False))[4::], sort_keys=True, indent=4))
             else:
-                f.write(json.dumps(re.split('<br>', self.forum.getF("http://gta-trinity.ru/"+server+"mon/bans.php", False))[6::], sort_keys=True, indent=4))
+                f.write(json.dumps(re.split('<br>', self.forum.getF("http://gta-trinity.ru/"+server+"mon/bans.php", False))[5::], sort_keys=True, indent=4))
 
 p = Parser()
 while True:

@@ -4,3 +4,4 @@ rpg.json
 temp_json.html
 .vscode
 env
+*.pyc

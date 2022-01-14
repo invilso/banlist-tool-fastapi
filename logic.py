@@ -12,7 +12,7 @@ class Logic():
             if check != False:
                 respdata = check
                 return JSONResponse(respdata)
-            await asyncio.sleep(3)
+            await asyncio.sleep(10)
         return JSONResponse(respdata)
 
     async def getJson(self, server_id, count):
