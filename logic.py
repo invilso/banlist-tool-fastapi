@@ -9,7 +9,7 @@ from parse import Parser
 parser = Parser()
 
 class Logic():
-    servers = ['rpg', 'rp', 'rp2']
+    servers = ['rpg', '1rp', '2rp']
 
     async def updateBans(self, server_id: int) -> None:
         try:
