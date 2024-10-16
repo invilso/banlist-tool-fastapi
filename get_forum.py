@@ -2,6 +2,7 @@ import requests
 from memory_profiler import memory_usage
 import antiddos 
 import time
+import re
 
 class LoginAndGet:
     session = requests.Session()
@@ -68,7 +69,7 @@ class LoginAndGet:
                     print(time.strftime('%H:%M:%S') +': LOG: GET Without Login - OK || RAM: '+ str(memory_usage()))
                     r = None
                 else:
-                    print("Пхд форум лег: " + str(r.status_code))
+                    print("Forum is broken: " + str(r.status_code))
             except Exception as err:
                 print("ERROR: In method GET (without login): "+str(err))
                 self.getF(link, login)
