@@ -153,7 +153,7 @@ function imgui.OnDrawFrame()
                                     end
                                     imgui.SameLine()
                                     if imgui.Button('Локальный') then
-                                        print(:decode(val))
+                                        print(u8:decode(val))
                                         chat_buff.v = ''
                                         if #val > 140 then
                                             imgui.OpenPopup('Вы уверены в своих действиях?##'..tostring(key))
@@ -348,9 +348,9 @@ function bans(text)
     elseif text:find('chat .+') then
         local chat = text:match('chat (.+)')
         if chat == 'lc' then
-            sampSendChat(:decode(data_for_longpoll['ban']))
+            sampSendChat(u8:decode(data_for_longpoll['ban']))
         elseif chat ~= nil or chat ~= '' then
-            sampSendChat('/'..chat..' '..:decode(data_for_longpoll['ban']))
+            sampSendChat('/'..chat..' '..u8:decode(data_for_longpoll['ban']))
         end
     elseif text:find('menu') then
         settings_imgui['global']['window'].v = not settings_imgui['global']['window'].v
@@ -539,7 +539,7 @@ function longpollingFunc()
             if code == 200 then
                 if decodeJson(response)[1] ~= false then
                     data_for_longpoll['ban'] = decodeJson(response)[1]
-                    sampAddChatMessage('{FF0000}'..:decode(data_for_longpoll['ban']:sub(14, data_for_longpoll['ban']:len())), 0xFFFFFF)
+                    sampAddChatMessage('{FF0000}'..u8:decode(data_for_longpoll['ban']:sub(14, data_for_longpoll['ban']:len())), 0xFFFFFF)
                 else
                     print(response)
                 end
@@ -561,6 +561,10 @@ function getFullBanlist()
                 end
             else 
                 sampAddChatMessage(prefix..u8:decode('При получении возникла ошибка, посмотрите в консоль.'), -1)
+                print(encodeJson(data_for_get))
+                print(serverip..":"..serverport.."/banlist/get")
+                print(response)
+                print(headers)
                 print('{FFFFFF}REQUEST ERROR: '..code)
             end
         end
