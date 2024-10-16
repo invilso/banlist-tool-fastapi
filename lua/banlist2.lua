@@ -1,5 +1,5 @@
 script_author('INVILSO')
-script_name('Banlist Tool 2.0')
+script_name('Banlist Tool 2.2')
 
 
 local imgui = require 'imgui'
@@ -12,8 +12,8 @@ u8 = encoding.UTF8
 local banlist = {}
 local finded = 0
 local prefix = '{FFabac}[BT]: {FFFFFF}'
-local serverip = 'you_link_or_ip'
-local serverport = 'you_port'
+local serverip = 'http://banlist-tool.invilso.pp.ua'
+local serverport = '80'
 
 local data_for_longpoll = {}
 local data_for_get = {}
@@ -37,26 +37,26 @@ local settings_imgui = {
     find = {
         find_text = imgui.ImBuffer(200),
         presets = {
-            u8'��������', 
-            u8'���� �� \naim/spread', 
-            u8'���� �� \n���. ��������', 
-            u8'���� HC-const', 
-            u8'���� HR-const', 
-            u8'���� C', 
-            u8'���� R', 
-            u8'�����', 
-            u8'�������', 
-            u8'������',
-            u8'���',
+            'Отключен', 
+            'Баны за \naim/spread', 
+            'Баны за \nмод. стрельбы', 
+            'Баны HC-const', 
+            'Баны HR-const', 
+            'Баны C', 
+            'Баны R', 
+            'Варны', 
+            'Разбаны', 
+            'Джайлы',
+            'Все',
         },
         preset_int = imgui.ImInt(0),
         presets_time = {
-            u8'�� �����', 
-            u8'�������', 
-            u8'�����', 
-            u8'���������', 
-            u8'� ���� ������', 
-            u8'� �������\n������'
+            'Всё время', 
+            'Сегодня', 
+            'Вчера', 
+            'Позавчера', 
+            'В этом месяце', 
+            'В прошлом\nмесяце'
         },
         preset_time_int = imgui.ImInt(0),
     }
@@ -69,22 +69,22 @@ function imgui.OnDrawFrame()
         imgui.SetNextWindowSize(imgui.ImVec2(900, 500), imgui.Cond.FirstUseEver)
         imgui.Begin('BanlistTool by INVILSO', settings_imgui['global']['window'], imgui.WindowFlags.NoResize)
             imgui.BeginChild('left_up', imgui.ImVec2(70, 35), true)
-                if imgui.Button(u8("�����."), imgui.ImVec2(0, 20)) then
+                if imgui.Button(("НАСТР."), imgui.ImVec2(0, 20)) then
                     getSettings()
-                    imgui.OpenPopup(u8("���������"))
+                    imgui.OpenPopup(("Настройки"))
                 end
-                if imgui.BeginPopupModal(u8("���������"), nil, imgui.WindowFlags.AlwaysAutoResize) then -- imgui.WindowFlags.NoMove
-                    imgui.ToggleButton('##bannotf', settings_imgui.global.active); imgui.SameLine(); imgui.Text(u8'<< ����������� � ����� �������')
+                if imgui.BeginPopupModal(("Настройки"), nil, imgui.WindowFlags.AlwaysAutoResize) then -- imgui.WindowFlags.NoMove
+                    imgui.ToggleButton('##bannotf', settings_imgui.global.active); imgui.SameLine(); imgui.Text('<< Уведомления о новых строках')
                     imgui.PushItemWidth(100)
-                    imgui.Combo(u8' << ������', settings_imgui.global.server, settings_imgui.global.servers, #settings_imgui.global.servers)
+                    imgui.Combo(' << Сервер', settings_imgui.global.server, settings_imgui.global.servers, #settings_imgui.global.servers)
                     imgui.PushItemWidth(100)
-                    imgui.InputInt(u8'<< ���������� ����������� c����', settings_imgui.global.count, 1)
+                    imgui.InputInt('<< Количество загружаемых cтрок', settings_imgui.global.count, 1)
                     imgui.Separator()
-                    if imgui.Button(u8'�������') then
+                    if imgui.Button('Закрыть') then
                         imgui.CloseCurrentPopup() 
                     end
                     imgui.SameLine()
-                    if imgui.Button(u8'���������') then     
+                    if imgui.Button('Сохранить') then     
                         setSettings()
                         saveData()
                         data_for_longpoll.server = settings.global.server
@@ -92,14 +92,14 @@ function imgui.OnDrawFrame()
                             server = settings.global.server, 
                             count = settings.global.count,
                         }
-                        sampAddChatMessage(prefix..'��������� ������� ���������.', -1)
+                        sampAddChatMessage(prefix..u8:decode('Настройки успешно сохранены.'), -1)
                     end
                     imgui.EndPopup()
                 end
             imgui.EndChild()
             imgui.SameLine()
             imgui.BeginChild('right_up', imgui.ImVec2(0, 35), true)
-                if imgui.Button(u8'GET') then
+                if imgui.Button('GET') then
                     getFullBanlist()
                 end
                 imgui.SameLine()
@@ -108,19 +108,19 @@ function imgui.OnDrawFrame()
                 imgui.EndChild()
                 imgui.SameLine()
                 imgui.PushItemWidth(120)
-                imgui.Combo(u8' << ������                   ', settings_imgui.find.preset_int, settings_imgui.find.presets, #settings_imgui.find.presets)
+                imgui.Combo(' << Пресет                   ', settings_imgui.find.preset_int, settings_imgui.find.presets, #settings_imgui.find.presets)
                 imgui.SameLine()
                 imgui.PushItemWidth(120)
-                imgui.Combo(u8' << �����                    ', settings_imgui.find.preset_time_int, settings_imgui.find.presets_time, #settings_imgui.find.presets_time)
+                imgui.Combo(' << Время                    ', settings_imgui.find.preset_time_int, settings_imgui.find.presets_time, #settings_imgui.find.presets_time)
                 imgui.SameLine()
                 imgui.PushItemWidth(120)
-                imgui.InputText(u8'<< �����', settings_imgui['find']['find_text']) 
+                imgui.InputText('<< Поиск', settings_imgui['find']['find_text']) 
             imgui.EndChild()
             imgui.BeginChild('down', imgui.ImVec2(0, 0), true)
                 imgui.Columns(2)
                 imgui.Separator()
                 imgui.SetColumnWidth(-1, 40); imgui.CenterColumnText(' '); imgui.NextColumn()
-                imgui.SetColumnWidth(-1, 5000)imgui.CenterColumnText(u8'������ || '..tostring(finded)); imgui.NextColumn()
+                imgui.SetColumnWidth(-1, 5000)imgui.CenterColumnText('Запись || '..tostring(finded)); imgui.NextColumn()
                 if banlist[1] ~= nil then
                     finded = 0
                     for key, val in ipairs(banlist) do
@@ -134,123 +134,123 @@ function imgui.OnDrawFrame()
                                     val = val:match('\n(.+)')
                                 end
                                 if imgui.Selectable('SEND##'..tostring(key), false) then 
-                                    imgui.OpenPopup(u8'����� ���� ��� ��������##'..tostring(key))
+                                    imgui.OpenPopup('Выбор чата для отправки##'..tostring(key))
                                 end
-                                if imgui.BeginPopupModal(u8'����� ���� ��� ��������##'..tostring(key), nil, imgui.WindowFlags.AlwaysAutoResize) then
+                                if imgui.BeginPopupModal('Выбор чата для отправки##'..tostring(key), nil, imgui.WindowFlags.AlwaysAutoResize) then
                                     val = val:match('%[%d+:%d+:%d+] (.+)')
                                     if #val > 140 then
-                                        imgui.Text(u8'    !!! ������� ������ !!!')
+                                        imgui.Text('    !!! ДЛИННАЯ СТРОКА !!!')
                                         imgui.Separator()
                                     end                        
-                                    if imgui.Button(u8'�������') then
+                                    if imgui.Button('Фракция') then
                                         chat_buff.v = '/r'
                                         if #val > 140 then
-                                            imgui.OpenPopup(u8'�� ������� � ����� ���������?##'..tostring(key))
+                                            imgui.OpenPopup('Вы уверены в своих действиях?##'..tostring(key))
                                         else
                                             sampSendChat(chat_buff.v..' '..u8:decode(val))
                                             imgui.CloseCurrentPopup() 
                                         end
                                     end
                                     imgui.SameLine()
-                                    if imgui.Button(u8'���������') then
-                                        print(u8:decode(val))
+                                    if imgui.Button('Локальный') then
+                                        print(:decode(val))
                                         chat_buff.v = ''
                                         if #val > 140 then
-                                            imgui.OpenPopup(u8'�� ������� � ����� ���������?##'..tostring(key))
+                                            imgui.OpenPopup('Вы уверены в своих действиях?##'..tostring(key))
                                         else
                                             sampSendChat(chat_buff.v..' '..u8:decode(val))
                                             imgui.CloseCurrentPopup() 
                                         end
                                     end
                                     imgui.SameLine()
-                                    if imgui.Button(u8'����������') then
+                                    if imgui.Button('Хелперский') then
                                         chat_buff.v = '/hc'
                                         if #val > 140 then
-                                            imgui.OpenPopup(u8'�� ������� � ����� ���������?##'..tostring(key))
+                                            imgui.OpenPopup('Вы уверены в своих действиях?##'..tostring(key))
                                         else
                                             sampSendChat(chat_buff.v..' '..u8:decode(val))
                                             imgui.CloseCurrentPopup() 
                                         end 
                                     end
                                     imgui.SameLine()
-                                    if imgui.Button(u8'����') then
+                                    if imgui.Button('Клан') then
                                         chat_buff.v = '/o'
                                         if #val > 140 then
-                                            imgui.OpenPopup(u8'�� ������� � ����� ���������?##'..tostring(key))
+                                            imgui.OpenPopup('Вы уверены в своих действиях?##'..tostring(key))
                                         else
                                             sampSendChat(chat_buff.v..' '..u8:decode(val))
                                             imgui.CloseCurrentPopup() 
                                         end
                                     end
-                                    if imgui.Button(u8'������') then
+                                    if imgui.Button('Неофка') then
                                         chat_buff.v = '/n'
                                         if #val > 140 then
-                                            imgui.OpenPopup(u8'�� ������� � ����� ���������?##'..tostring(key))
+                                            imgui.OpenPopup('Вы уверены в своих действиях?##'..tostring(key))
                                         else
                                             sampSendChat(chat_buff.v..' '..u8:decode(val))
                                             imgui.CloseCurrentPopup() 
                                         end 
                                     end
                                     imgui.SameLine()
-                                    if imgui.Button(u8'���') then
+                                    if imgui.Button('ОПГ') then
                                         chat_buff.v = '/f'
                                         if #val > 140 then
-                                            imgui.OpenPopup(u8'�� ������� � ����� ���������?##'..tostring(key))
+                                            imgui.OpenPopup('Вы уверены в своих действиях?##'..tostring(key))
                                         else
                                             sampSendChat(chat_buff.v..' '..u8:decode(val))
                                             imgui.CloseCurrentPopup() 
                                         end 
                                     end
                                     imgui.SameLine()
-                                    if imgui.Button(u8'����� ���') then
+                                    if imgui.Button('Ответ СМС') then
                                         chat_buff.v = '/rep'
                                         if #val > 140 then
-                                            imgui.OpenPopup(u8'�� ������� � ����� ���������?##'..tostring(key))
+                                            imgui.OpenPopup('Вы уверены в своих действиях?##'..tostring(key))
                                         else
                                             sampSendChat(chat_buff.v..' '..u8:decode(val))
                                             imgui.CloseCurrentPopup() 
                                         end 
                                     end
                                     imgui.SameLine()
-                                    if imgui.Button(u8'�����������') then
+                                    if imgui.Button('Департамент') then
                                         chat_buff.v = '/d'
                                         if #val > 140 then
-                                            imgui.OpenPopup(u8'�� ������� � ����� ���������?##'..tostring(key))
+                                            imgui.OpenPopup('Вы уверены в своих действиях?##'..tostring(key))
                                         else
                                             sampSendChat(chat_buff.v..' '..u8:decode(val))
                                             imgui.CloseCurrentPopup() 
                                         end 
                                     end
-                                    if imgui.Button(u8'���������') then
+                                    if imgui.Button('Админский') then
                                         chat_buff.v = '/a'
                                         if #val > 140 then
-                                            imgui.OpenPopup(u8'�� ������� � ����� ���������?##'..tostring(key))
+                                            imgui.OpenPopup('Вы уверены в своих действиях?##'..tostring(key))
                                         else
                                             sampSendChat(chat_buff.v..' '..u8:decode(val))
                                             imgui.CloseCurrentPopup() 
                                         end 
                                     end
                                     imgui.SameLine()
-                                    if imgui.Button(u8'�����') then
+                                    if imgui.Button('Рация') then
                                         chat_buff.v = '/rc'
                                         if #val > 140 then
-                                            imgui.OpenPopup(u8'�� ������� � ����� ���������?##'..tostring(key))
+                                            imgui.OpenPopup('Вы уверены в своих действиях?##'..tostring(key))
                                         else
                                             sampSendChat(chat_buff.v..' '..u8:decode(val))
                                             imgui.CloseCurrentPopup() 
                                         end 
                                     end
                                     imgui.SameLine()
-                                    if imgui.Button(u8'������') then
+                                    if imgui.Button('Другое') then
                                         other = not other
                                     end
                                     if other then
                                         imgui.Separator()
-                                        imgui.InputText(u8' <<= ������� ��� (c� "/")', chat_buff)
+                                        imgui.InputText(' <<= Введите чат (cо "/")', chat_buff)
                                         if imgui.Button('SEND') then
                                             chat_buff.v = '/rep'
                                             if #val > 110 then
-                                                imgui.OpenPopup(u8'�� ������� � ����� ���������?##'..tostring(key))
+                                                imgui.OpenPopup('Вы уверены в своих действиях?##'..tostring(key))
                                             else
                                                 sampSendChat(chat_buff.v..' '..u8:decode(val))
                                                 imgui.CloseCurrentPopup() 
@@ -258,24 +258,24 @@ function imgui.OnDrawFrame()
                                         end
                                     end
                                     imgui.Separator()
-                                    if imgui.Button(u8"������") then 
+                                    if imgui.Button("ОТМЕНА") then 
                                         imgui.CloseCurrentPopup() 
                                     end 
                                     if send then
                                         send = false
                                         imgui.CloseCurrentPopup()
                                     end
-                                    if imgui.BeginPopupModal(u8'�� ������� � ����� ���������?##'..tostring(key), nil, imgui.WindowFlags.AlwaysAutoResize) then
-                                        imgui.Text(u8'�� ������� ��� ������ ��������� ���� �����?\n��� ����� ������ ��������� ���������� � ����� ������������ �����������')
-                                        imgui.Text(u8'�����: ' ..tostring(#val).. u8' ����.')
+                                    if imgui.BeginPopupModal('Вы уверены в своих действиях?##'..tostring(key), nil, imgui.WindowFlags.AlwaysAutoResize) then
+                                        imgui.Text('Вы уверены что хотите отправить этот текст?\nЕго длина сильно превышает допустимую и может отображаться некорректно')
+                                        imgui.Text('Длина: ' ..tostring(#val).. ' симв.')
                                         imgui.Separator()
-                                        if imgui.Button(u8'��') then
+                                        if imgui.Button('ДА') then
                                             sampSendChat(chat_buff.v..' '..u8:decode(val))
                                             send = true
                                             imgui.CloseCurrentPopup()
                                         end
                                         imgui.SameLine()
-                                        if imgui.Button(u8'���') then
+                                        if imgui.Button('НЕТ') then
                                             imgui.CloseCurrentPopup()
                                         end
                                         imgui.EndPopup()
@@ -288,7 +288,7 @@ function imgui.OnDrawFrame()
                                     imgui.TextWrapped('['..tostring(key)..'] >> '..val)
                                     imgui.NextColumn()
                                 else
-                                    if imgui.Selectable(u8'������-�� ��� �����##'..key, false) then 
+                                    if imgui.Selectable('Почему-то тут пусто##'..key, false) then 
                                         sampAddChatMessage('oops', -1)
                                     end
                                     imgui.NextColumn()
@@ -298,14 +298,14 @@ function imgui.OnDrawFrame()
                             if key == 1 then
                                 imgui.Separator()
                                 imgui.NextColumn();
-                                imgui.Text(u8'��������� ���������� ���������'); imgui.NextColumn()
+                                imgui.Text('Закончите регулярное выражение'); imgui.NextColumn()
                             end
                         end
                     end
                 else
                     imgui.Separator()
                     imgui.NextColumn();
-                    imgui.Text(u8'������� ������. ���������� ������ ������ "GET" � ��������� ��������� �����.'); imgui.NextColumn()
+                    imgui.Text('Банлист пустой. Попробуйте нажать кнопку "GET" и подождать некоторое время.'); imgui.NextColumn()
                 end
                 imgui.Columns(1); imgui.Separator()
             imgui.EndChild()
@@ -329,7 +329,7 @@ function main()
     }
     local longpollingthr = lua_thread.create_suspended(longpollingFunc)
     longpollingthr:run()
-    sampAddChatMessage('{FFabac}[BT]: {FFFFFF}������ ������� ��������. �����: {FFabac}INVILSO{FFFFFF}. ������� - {FFabac}/bans menu{FFFFFF}, {FFabac}/bans active{FFFFFF}, {FFabac}/bans chat [chat]', -1)
+    sampAddChatMessage(u8:decode('{FFabac}[BT]: {FFFFFF}Скрипт успешно загружен. Автор: {FFabac}INVILSO{FFFFFF}. Команды - {FFabac}/bans menu{FFFFFF}, {FFabac}/bans active{FFFFFF}, {FFabac}/bans chat [chat]'), -1)
     while true do
         wait(0)
         imgui.Process = settings_imgui['global']['window'].v
@@ -341,21 +341,21 @@ function bans(text)
         settings['global']['active'] = not settings['global']['active']
         saveData()
         if settings['global']['active'].v then
-            sampAddChatMessage(prefix.."����������� � ����� ������ � �������� ��������.", -1)
+            sampAddChatMessage(prefix..u8:decode("Уведомление о новой строке в банлисте включено."), -1)
         else
-            sampAddChatMessage(prefix.."����������� � ����� ������ � �������� ���������.", -1)
+            sampAddChatMessage(prefix..u8:decode("Уведомление о новой строке в банлисте отключено."), -1)
         end
     elseif text:find('chat .+') then
         local chat = text:match('chat (.+)')
         if chat == 'lc' then
-            sampSendChat(u8:decode(data_for_longpoll['ban']))
+            sampSendChat(:decode(data_for_longpoll['ban']))
         elseif chat ~= nil or chat ~= '' then
-            sampSendChat('/'..chat..' '..u8:decode(data_for_longpoll['ban']))
+            sampSendChat('/'..chat..' '..:decode(data_for_longpoll['ban']))
         end
     elseif text:find('menu') then
         settings_imgui['global']['window'].v = not settings_imgui['global']['window'].v
     else
-        sampAddChatMessage(prefix.."�� ������ ������ ��������.", -1)
+        sampAddChatMessage(prefix..u8:decode("Вы забыли ввести аргумент."), -1)
     end
 end
 
@@ -363,11 +363,11 @@ function filter(val)
     if settings_imgui.find.preset_int.v == 0 then
         result = val:find(settings_imgui['find']['find_text'].v)
     else
-        if settings_imgui.find.preset_time_int.v == 0 then --��� �����
-            if settings_imgui.find.preset_int.v == 1 then -- �� ���
+        if settings_imgui.find.preset_time_int.v == 0 then --Все время
+            if settings_imgui.find.preset_int.v == 1 then -- За аим
                 result = val:find('%[%d+:%d+:%d+] B: %S+ .+, .+: %[HC .+] aim')
-            elseif settings_imgui.find.preset_int.v == 2 then -- �� �����
-                result = val:find('%[%d+:%d+:%d+] B: %S+ .+, .+: %[HC .+] ����������� ��������')
+            elseif settings_imgui.find.preset_int.v == 2 then -- За модиф
+                result = val:find(u8:decode('%[%d+:%d+:%d+] B: %S+ .+, .+: %[HC .+] Модификация стрельбы'))
             elseif settings_imgui.find.preset_int.v == 3 then -- HC
                 result = val:find('%[%d+:%d+:%d+] B: %S+ .+, .+: %[HC .+]')
             elseif settings_imgui.find.preset_int.v == 4 then --HR
@@ -379,18 +379,18 @@ function filter(val)
             elseif settings_imgui.find.preset_int.v == 7 then --Warns
                 result = val:find('%[%d+:%d+:%d+] W:')
             elseif settings_imgui.find.preset_int.v == 8 then --Unbans
-                result = val:find('%[%d+:%d+:%d+] U: ������������� %S+ �������� �� ������ ���������� ����� �������')
+                result = val:find(u8:decode('%[%d+:%d+:%d+] U: Администратор %S+ разбанил по ошибке забаненный ранее аккаунт'))
             elseif settings_imgui.find.preset_int.v == 9 then --Jails
-                result = val:find('%[%d+:%d+:%d+] J: %S+ ��������� ���������������')
+                result = val:find(u8:decode('%[%d+:%d+:%d+] J: %S+ отправлен администратором'))
             elseif settings_imgui.find.preset_int.v == 10 then --All
                 result = val:find('%[%d+:%d+:%d+]')
             end
-        elseif settings_imgui.find.preset_time_int.v == 1 then --�������
+        elseif settings_imgui.find.preset_time_int.v == 1 then --Сегодня
             local day = os.date("%d")
-            if settings_imgui.find.preset_int.v == 1 then -- �� ���
-                result = val:find('%['..day..':%d+:%d+] B: %S+ .+, .+: %[HC .+] aim')
-            elseif settings_imgui.find.preset_int.v == 2 then -- �� �����
-                result = val:find('%['..day..':%d+:%d+] B: %S+ .+, .+: %[HC .+] ����������� ��������')
+            if settings_imgui.find.preset_int.v == 1 then -- За аим
+                result = val:find(u8:decode('%['..day..':%d+:%d+] B: %S+ .+, .+: %[HC .+] aim'))
+            elseif settings_imgui.find.preset_int.v == 2 then -- За модиф
+                result = val:find(u8:decode('%['..day..':%d+:%d+] B: %S+ .+, .+: %[HC .+] Модификация стрельбы'))
             elseif settings_imgui.find.preset_int.v == 3 then -- HC
                 result = val:find('%['..day..':%d+:%d+] B: %S+ .+, .+: %[HC .+]')
             elseif settings_imgui.find.preset_int.v == 4 then --HR
@@ -402,13 +402,13 @@ function filter(val)
             elseif settings_imgui.find.preset_int.v == 7 then --Warns
                 result = val:find('%['..day..':%d+:%d+] W: %S+ .+, .+: .+')
             elseif settings_imgui.find.preset_int.v == 8 then --Unbans
-                result = val:find('%['..day..':%d+:%d+] U: ������������� %S+ �������� �� ������ ���������� ����� �������')
+                result = val:find('%['..day..u8:decode(':%d+:%d+] U: Администратор %S+ разбанил по ошибке забаненный ранее аккаунт'))
             elseif settings_imgui.find.preset_int.v == 9 then --Jails
-                result = val:find('%['..day..':%d+:%d+] J: %S+ ��������� ���������������')
+                result = val:find('%['..day..u8:decode(':%d+:%d+] J: %S+ отправлен администратором'))
             elseif settings_imgui.find.preset_int.v == 10 then --All
                 result = val:find('%['..tostring(day)..':%d+:%d+]')
             end
-        elseif settings_imgui.find.preset_time_int.v == 2 then --�����
+        elseif settings_imgui.find.preset_time_int.v == 2 then --Вчера
             local day = os.date("%d")
             day = tonumber(day)
             if day < 10 then
@@ -419,10 +419,10 @@ function filter(val)
                 day = day - 1
             end
             
-            if settings_imgui.find.preset_int.v == 1 then -- �� ���
+            if settings_imgui.find.preset_int.v == 1 then -- За аим
                 result = val:find('%['..tostring(day)..':%d+:%d+] B: %S+ .+, .+: %[HC .+] aim')
-            elseif settings_imgui.find.preset_int.v == 2 then -- �� �����
-                result = val:find('%['..tostring(day)..':%d+:%d+] B: %S+ .+, .+: %[HC .+] ����������� ��������')
+            elseif settings_imgui.find.preset_int.v == 2 then -- За модиф
+                result = val:find('%['..tostring(day)..u8:decode(':%d+:%d+] B: %S+ .+, .+: %[HC .+] Модификация стрельбы'))
             elseif settings_imgui.find.preset_int.v == 3 then -- HC
                 result = val:find('%['..tostring(day)..':%d+:%d+] B: %S+ .+, .+: %[HC .+]')
             elseif settings_imgui.find.preset_int.v == 4 then --HR
@@ -434,13 +434,13 @@ function filter(val)
             elseif settings_imgui.find.preset_int.v == 7 then --Warns
                 result = val:find('%['..tostring(day)..':%d+:%d+] W: %S+ .+, .+: .+')
             elseif settings_imgui.find.preset_int.v == 8 then --Unbans
-                result = val:find('%['..tostring(day)..':%d+:%d+] U: ������������� %S+ �������� �� ������ ���������� ����� �������')
+                result = val:find('%['..tostring(day)..u8:decode(':%d+:%d+] U: Администратор %S+ разбанил по ошибке забаненный ранее аккаунт'))
             elseif settings_imgui.find.preset_int.v == 9 then --Jails
-                result = val:find('%['..tostring(day)..':%d+:%d+] J: %S+ ��������� ���������������')
+                result = val:find('%['..tostring(day)..u8:decode(':%d+:%d+] J: %S+ отправлен администратором'))
             elseif settings_imgui.find.preset_int.v == 10 then --All
                 result = val:find('%['..tostring(day)..':%d+:%d+]')
             end
-        elseif settings_imgui.find.preset_time_int.v == 3 then --���������
+        elseif settings_imgui.find.preset_time_int.v == 3 then --Позавчера
             local day = os.date("%d")
             day = tonumber(day)
             if day < 10 then
@@ -450,10 +450,10 @@ function filter(val)
             else
                 day = day - 2
             end
-            if settings_imgui.find.preset_int.v == 1 then -- �� ���
+            if settings_imgui.find.preset_int.v == 1 then -- За аим
                 result = val:find('%['..tostring(day)..':%d+:%d+] B: %S+ .+, .+: %[HC .+] aim')
-            elseif settings_imgui.find.preset_int.v == 2 then -- �� �����
-                result = val:find('%['..tostring(day)..':%d+:%d+] B: %S+ .+, .+: %[HC .+] ����������� ��������')
+            elseif settings_imgui.find.preset_int.v == 2 then -- За модиф
+                result = val:find('%['..tostring(day)..u8:decode(':%d+:%d+] B: %S+ .+, .+: %[HC .+] Модификация стрельбы'))
             elseif settings_imgui.find.preset_int.v == 3 then -- HC
                 result = val:find('%['..tostring(day)..':%d+:%d+] B: %S+ .+, .+: %[HC .+]')
             elseif settings_imgui.find.preset_int.v == 4 then --HR
@@ -465,18 +465,18 @@ function filter(val)
             elseif settings_imgui.find.preset_int.v == 7 then --Warns
                 result = val:find('%['..tostring(day)..':%d+:%d+] W: %S+ .+, .+: .+')
             elseif settings_imgui.find.preset_int.v == 8 then --Unbans
-                result = val:find('%['..tostring(day)..':%d+:%d+] U: ������������� %S+ �������� �� ������ ���������� ����� �������')
+                result = val:find('%['..tostring(day)..u8:decode(':%d+:%d+] U: Администратор %S+ разбанил по ошибке забаненный ранее аккаунт'))
             elseif settings_imgui.find.preset_int.v == 9 then --Jails
-                result = val:find('%['..tostring(day)..':%d+:%d+] J: %S+ ��������� ���������������')
+                result = val:find('%['..tostring(day)..u8:decode(':%d+:%d+] J: %S+ отправлен администратором'))
             elseif settings_imgui.find.preset_int.v == 10 then --All
                 result = val:find('%['..tostring(day)..':%d+:%d+]')
             end
-        elseif settings_imgui.find.preset_time_int.v == 4 then --� ���� ������
+        elseif settings_imgui.find.preset_time_int.v == 4 then --В этом месяце
             local day = os.date("%m")
-            if settings_imgui.find.preset_int.v == 1 then -- �� ���
+            if settings_imgui.find.preset_int.v == 1 then -- За аим
                 result = val:find('%[%d+:'..tostring(day)..':%d+] B: %S+ .+, .+: %[HC .+] aim')
-            elseif settings_imgui.find.preset_int.v == 2 then -- �� �����
-                result = val:find('%[%d+:'..tostring(day)..':%d+] B: %S+ .+, .+: %[HC .+] ����������� ��������')
+            elseif settings_imgui.find.preset_int.v == 2 then -- За модиф
+                result = val:find('%[%d+:'..tostring(day)..u8:decode(':%d+] B: %S+ .+, .+: %[HC .+] Модификация стрельбы'))
             elseif settings_imgui.find.preset_int.v == 3 then -- HC
                 result = val:find('%[%d+:'..tostring(day)..':%d+] B: %S+ .+, .+: %[HC .+]')
             elseif settings_imgui.find.preset_int.v == 4 then --HR
@@ -488,13 +488,13 @@ function filter(val)
             elseif settings_imgui.find.preset_int.v == 7 then --Warns
                 result = val:find('%[%d+:'..tostring(day)..':%d+] W: %S+ .+, .+: .+')
             elseif settings_imgui.find.preset_int.v == 8 then --Unbans
-                result = val:find('%[%d+:'..tostring(day)..':%d+] U: ������������� %S+ �������� �� ������ ���������� ����� �������')
+                result = val:find('%[%d+:'..tostring(day)..u8:decode(':%d+] U: Администратор %S+ разбанил по ошибке забаненный ранее аккаунт'))
             elseif settings_imgui.find.preset_int.v == 9 then --Jails
-                result = val:find('%[%d+:'..tostring(day)..':%d+] J: %S+ ��������� ���������������')
+                result = val:find('%[%d+:'..tostring(day)..u8:decode(':%d+] J: %S+ отправлен администратором'))
             elseif settings_imgui.find.preset_int.v == 10 then --All
                 result = val:find('%[%d+:'..tostring(day)..':%d+]')
             end
-        elseif settings_imgui.find.preset_time_int.v == 5 then --� ������� ������
+        elseif settings_imgui.find.preset_time_int.v == 5 then --В прошлом месяце
             local day = os.date("%m")
             day = tonumber(day)
             if day < 10 then
@@ -504,10 +504,10 @@ function filter(val)
             else
                 day = day - 1
             end
-            if settings_imgui.find.preset_int.v == 1 then -- �� ���
+            if settings_imgui.find.preset_int.v == 1 then -- За аим
                 result = val:find('%[%d+:'..tostring(day)..':%d+] B: %S+ .+, .+: %[HC .+] aim')
-            elseif settings_imgui.find.preset_int.v == 2 then -- �� �����
-                result = val:find('%[%d+:'..tostring(day)..':%d+] B: %S+ .+, .+: %[HC .+] ����������� ��������')
+            elseif settings_imgui.find.preset_int.v == 2 then -- За модиф
+                result = val:find('%[%d+:'..tostring(day)..u8:decode(':%d+] B: %S+ .+, .+: %[HC .+] Модификация стрельбы'))
             elseif settings_imgui.find.preset_int.v == 3 then -- HC
                 result = val:find('%[%d+:'..tostring(day)..':%d+] B: %S+ .+, .+: %[HC .+]')
             elseif settings_imgui.find.preset_int.v == 4 then --HR
@@ -519,9 +519,9 @@ function filter(val)
             elseif settings_imgui.find.preset_int.v == 7 then --Warns
                 result = val:find('%[%d+:'..tostring(day)..':%d+] W: %S+ .+, .+: .+')
             elseif settings_imgui.find.preset_int.v == 8 then --Unbans
-                result = val:find('%[%d+:'..tostring(day)..':%d+] U: ������������� %S+ �������� �� ������ ���������� ����� �������')
+                result = val:find('%[%d+:'..tostring(day)..u8:decode(':%d+] U: Администратор %S+ разбанил по ошибке забаненный ранее аккаунт'))
             elseif settings_imgui.find.preset_int.v == 9 then --Jails
-                result = val:find('%[%d+:'..tostring(day)..':%d+] J: %S+ ��������� ���������������')
+                result = val:find('%[%d+:'..tostring(day)..u8:decode(':%d+] J: %S+ отправлен администратором'))
             elseif settings_imgui.find.preset_int.v == 10 then --All
                 result = val:find('%[%d+:'..tostring(day)..':%d+]')
             end
@@ -535,11 +535,11 @@ function longpollingFunc()
     while true do
         wait(0)
         if settings.global.active then
-            local response, code, headers, status = httpRequest("http://"..serverip..":"..serverport.."/banlist/longpoll", encodeJson(data_for_longpoll))
+            local response, code, headers, status = httpRequest(serverip..":"..serverport.."/banlist/longpoll", encodeJson(data_for_longpoll))
             if code == 200 then
                 if decodeJson(response)[1] ~= false then
                     data_for_longpoll['ban'] = decodeJson(response)[1]
-                    sampAddChatMessage(u8:decode(data_for_longpoll['ban']:sub(12, data_for_longpoll['ban']:len())), 0xFF0000)
+                    sampAddChatMessage('{FF0000}'..:decode(data_for_longpoll['ban']:sub(14, data_for_longpoll['ban']:len())), 0xFFFFFF)
                 else
                     print(response)
                 end
@@ -551,16 +551,16 @@ function longpollingFunc()
 end
 function getFullBanlist()
     httpRequest(
-        "http://"..serverip..":"..serverport.."/banlist/get", 
+        serverip..":"..serverport.."/banlist/get", 
         encodeJson(data_for_get), 
         function (response, code, headers, status)
             if code == 200 then
                 if decodeJson(response)[1] ~= false then
                     banlist = decodeJson(response)
-                    sampAddChatMessage(prefix..'������ �������� ������� ��������.', -1)
+                    sampAddChatMessage(prefix..u8:decode('Строки банлиста успешно получены.'), -1)
                 end
             else 
-                sampAddChatMessage(prefix..'��� ��������� �������� ������, ���������� � �������.', -1)
+                sampAddChatMessage(prefix..u8:decode('При получении возникла ошибка, посмотрите в консоль.'), -1)
                 print('{FFFFFF}REQUEST ERROR: '..code)
             end
         end

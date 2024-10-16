@@ -11,12 +11,12 @@
             padding: 0;
             background-color: #f8f9fa;
             color: #343a40;
-            transition: background-color 0.5s ease, color 0.5s ease; /* Плавний перехід */
+            transition: background-color 0.5s ease, color 0.5s ease;
         }
         .dark-theme {
             background-color: #343a40;
             color: #f8f9fa;
-            transition: background-color 0.5s ease, color 0.5s ease; /* Плавний перехід */
+            transition: background-color 0.5s ease, color 0.5s ease;
         }
         .container {
             max-width: 1140px;
@@ -66,8 +66,10 @@
             background-color: #495057;
         }
         .copy-icon {
-            margin-left: auto;
+            margin-left: 10px;
             opacity: 0;
+            padding-top: 5px;
+            padding-right: 5px;
             transition: opacity 0.4s ease;
             font-size: 16px;
         }
@@ -101,7 +103,7 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.3s ease; /* Плавний перехід для кнопки */
+            transition: background-color 0.3s ease;
         }
         .dark-theme .theme-toggle-btn {
             background-color: #ffc107;
@@ -125,7 +127,7 @@
                     {% for el in bans %}
                         <div class="ban-item" onclick="copyToClipboard('{{el}}', this)">
                             [{{loop.index0}}] >> {{el}}
-                            <span class="copy-icon" style="margin-left:10px;padding-top: 5px; padding-right: 5px;">🗐</span>
+                            <span class="copy-icon">🗐</span>
                             <span class="copied">Copied!</span>
                         </div>
                     {% endfor %}
@@ -138,38 +140,38 @@
     </div>
 
     <script>
-        // Функція для зміни теми
+        
         function toggleTheme() {
             const btn = document.querySelector('.theme-toggle-btn');
 
-            // Перемикання теми
+            
             document.body.classList.toggle('dark-theme');
 
-            // Збереження вибору теми в localStorage
+            
             if (document.body.classList.contains('dark-theme')) {
                 btn.textContent = 'Light mode';
-                localStorage.setItem('theme', 'dark'); // Зберігаємо "dark" у localStorage
+                localStorage.setItem('theme', 'dark'); 
             } else {
                 btn.textContent = 'Dark mode';
-                localStorage.setItem('theme', 'light'); // Зберігаємо "light" у localStorage
+                localStorage.setItem('theme', 'light');
             }
         }
 
-        // Відновлення теми при завантаженні сторінки
+        
         window.onload = function() {
             const savedTheme = localStorage.getItem('theme');
             const btn = document.querySelector('.theme-toggle-btn');
         
-            // Встановлюємо темну тему за замовчуванням
+     
             if (savedTheme === 'dark' || !savedTheme) {
                 document.body.classList.add('dark-theme');
-                btn.textContent = 'Light mode'; // Текст кнопки для темної теми
+                btn.textContent = 'Light mode'; 
             } else {
-                btn.textContent = 'Dark mode'; // Якщо збережена "light"
+                btn.textContent = 'Dark mode';
             }
         };
 
-        // Додаємо обробник події для кнопки
+        
         document.querySelector('.theme-toggle-btn').addEventListener('click', toggleTheme);
 
         function copyToClipboard(text, element) {
