@@ -1,6 +1,4 @@
-rp.json
-rp2.json
-rpg.json
+*.json
 temp_json.html
 .vscode
 env

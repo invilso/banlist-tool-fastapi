@@ -1,0 +1,9 @@
+# flyctl launch added from .gitignore
+**/rp.json
+**/rp2.json
+**/rpg.json
+**/temp_json.html
+**/.vscode
+**/env
+**/*.pyc
+fly.toml

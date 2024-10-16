@@ -9,10 +9,10 @@ class Serializer():
                 with open("rpg.json", "r", encoding="utf-8") as f:
                     return json.load(f)[0:coun]
             elif server == 1:
-                with open("rp.json", "r", encoding="utf-8") as f:
+                with open("1rp.json", "r", encoding="utf-8") as f:
                     return  json.load(f)[0:coun]
             elif server == 2:
-                with open("rp2.json", "r", encoding="utf-8") as f:
+                with open("2rp.json", "r", encoding="utf-8") as f:
                     return json.load(f)[0:coun]
         except:
             return ['Строки ещё не загрузились']
@@ -21,9 +21,9 @@ class Serializer():
         if server == 0:
             return await self.getLongpollLine('rpg.json', ban)
         elif server == 1:
-            return await self.getLongpollLine('rp.json', ban)
+            return await self.getLongpollLine('1rp.json', ban)
         elif server == 2:
-            return await self.getLongpollLine('rp2.json', ban)
+            return await self.getLongpollLine('2rp.json', ban)
     
     async def getLongpollLine(self, server: str, ban: str):
         try:
