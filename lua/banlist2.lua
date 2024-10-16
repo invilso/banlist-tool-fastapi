@@ -12,7 +12,7 @@ u8 = encoding.UTF8
 local banlist = {}
 local finded = 0
 local prefix = '{FFabac}[BT]: {FFFFFF}'
-local serverip = 'http://banlist-tool.invilso.pp.ua'
+local serverip = 'http://banlist-tool.fly.dev'
 local serverport = '80'
 
 local data_for_longpoll = {}
